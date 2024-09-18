@@ -2,6 +2,7 @@ const { response } = require("express");
 const bcryptjs = require("bcryptjs");
 const Usuario = require("../models/usuario");
 const { generarJWT } = require("../helpers/generar-jwt");
+const blacklist = require("../helpers/token-black-list"); 
 
 const login = async (req, res = response) => {
   const { email, password } = req.body;
@@ -79,7 +80,7 @@ const generateNewToken = async (req, res = response) => {
       header: [
         {
           code: 400,
-          error: "el id es necesario",
+          error: "El ID es necesario",
         },
       ],
       body: [{}],
@@ -107,7 +108,49 @@ const generateNewToken = async (req, res = response) => {
     return res.status(500).json({
       header: [
         {
-          error: "tuvimos un error, por favor intentalo mas tarde",
+          error: "Tuvimos un error, por favor inténtalo más tarde",
+          code: 500,
+        },
+      ],
+      body: [{}],
+    });
+  }
+};
+
+const logout = async (req, res = response) => {
+  const token = req.header('Authorization'); 
+
+  if (!token) {
+    return res.status(400).json({
+      header: [
+        {
+          error: "El token es requerido",
+          code: 400,
+        },
+      ],
+      body: [{}],
+    });
+  }
+
+  try {
+    blacklist.add(token);
+
+    res.status(200).json({
+      header: [
+        {
+          error: "NO ERROR",
+          code: 200,
+          message: "Logout exitoso, token expirado",
+        },
+      ],
+      body: [{}],
+    });
+  } catch (error) {
+    console.log("logout error ==> " + error);
+    return res.status(500).json({
+      header: [
+        {
+          error: "Tuvimos un error, por favor inténtalo más tarde",
           code: 500,
         },
       ],
@@ -119,4 +162,5 @@ const generateNewToken = async (req, res = response) => {
 module.exports = {
   login,
   generateNewToken,
+  logout,
 };

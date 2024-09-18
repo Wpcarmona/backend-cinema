@@ -33,8 +33,6 @@ const validateJWT = async (req, res = response, next) => {
       });
     }
 
-    //Verificar si el uid tien estado en true
-
     if (!usuario.state) {
       return res.status(200).json({
         header: [
