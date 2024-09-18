@@ -185,21 +185,6 @@ const usuariosPost = async (req, res = response) => {
     });
   }
 
-  const emailprocess = email.lastIndexOf("@");
-  const domaninEmail = email.slice(emailprocess + 1, email.length);
-
-  if (domaninEmail != "gmail.com") {
-    return res.status(200).json({
-      header: [
-        {
-          error: "El correo debe ser gmail",
-          code: 400,
-        },
-      ],
-      body: [{}],
-    });
-  }
-
   if (password == undefined || password == "") {
     return res.status(200).json({
       header: [
@@ -285,7 +270,6 @@ const usuariosPost = async (req, res = response) => {
       phone,
       directory,
       firstName,
-      code,
     });
 
     const salt = bcryptjs.genSaltSync();
@@ -299,13 +283,10 @@ const usuariosPost = async (req, res = response) => {
         {
           error: "NO ERROR",
           code: 200,
+          token:token
         },
       ],
-      body: [
-        {
-          msg: "El usuario fue creado exitosamente.",
-        },
-      ],
+      body: [usuario],
     });
   } catch (error) {
     console.log("error al registrar =>" + error);
