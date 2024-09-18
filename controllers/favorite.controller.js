@@ -1,13 +1,12 @@
 const { response } = require("express");
 const Favorito = require("../models/favorite");
 
-// Obtener todos los favoritos del usuario por ID de usuario
 const obtenerFavoritosPorUsuario = async (req, res = response) => {
   const { userId } = req.params;
 
   try {
     const favoritos = await Favorito.find({ user: userId });
-    
+
     if (!favoritos.length) {
       return res.status(404).json({
         header: [{ code: 404, error: "No hay favoritos para este usuario" }],
@@ -55,12 +54,19 @@ const obtenerFavoritoPorId = async (req, res = response) => {
   }
 };
 
-// Guardar un favorito
 const guardarFavorito = async (req, res = response) => {
   const { userId, favoriteId, type } = req.body;
 
   try {
-    // Crear un nuevo favorito
+    const existeFavorito = await Favorito.findOne({ user: userId, favoriteId });
+
+    if (existeFavorito) {
+      return res.status(400).json({
+        header: [{ code: 400, error: "El favorito ya existe" }],
+        body: [{}],
+      });
+    }
+
     const nuevoFavorito = new Favorito({ user: userId, favoriteId, type });
     await nuevoFavorito.save();
 
@@ -77,7 +83,6 @@ const guardarFavorito = async (req, res = response) => {
   }
 };
 
-// Actualizar (marcar o desmarcar como favorito)
 const actualizarFavorito = async (req, res = response) => {
   const { id } = req.params;
 
@@ -91,7 +96,6 @@ const actualizarFavorito = async (req, res = response) => {
       });
     }
 
-    // Si el favorito existe, lo eliminamos (desmarcamos como favorito)
     await Favorito.findByIdAndDelete(id);
 
     res.status(200).json({
