@@ -1,6 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const { dbConnection } = require("../database/config");
+const YAML = require('yamljs');
+const path = require('path'); 
+const swaggerUi = require('swagger-ui-express');
 
 class Server {
   constructor() {
@@ -36,6 +39,11 @@ class Server {
     this.app.use(express.json());
 
     this.app.use(express.static("public"));
+
+    const swaggerDocument = YAML.load(path.join(__dirname, '../', 'swagger.yaml'));
+    this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+    
   }
 
   routes() {
