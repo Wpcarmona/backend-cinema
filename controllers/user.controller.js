@@ -2,7 +2,7 @@ const { response, request } = require("express");
 const bcryptjs = require("bcryptjs");
 const Usuario = require("../models/usuario");
 const { generarJWT } = require("../helpers");
-const { ObjectId } = require("mongoose").Types;
+const mongoose = require("mongoose"); 
 const cloudinary = require("cloudinary").v2;
 
 const usuariosGet = async (req = request, res = response) => {
@@ -43,9 +43,9 @@ const usuariosGet = async (req = request, res = response) => {
 
 const usuariosGetById = async (req = request, res = response) => {
   const { id } = req.params;
-
+  console.log(id);
   try {
-    const usuario = await Usuario.findById({ _id: ObjectId(id) });
+    const usuario = await Usuario.findById(new mongoose.Types.ObjectId(id));
     if (usuario) {
       res.status(200).json({
         header: [
@@ -61,11 +61,11 @@ const usuariosGetById = async (req = request, res = response) => {
         ],
       });
     } else {
-      res.status(200).json({
+      res.status(404).json({
         header: [
           {
             error: "No encontramos al usuario",
-            code: 400,
+            code: 404,
           },
         ],
         body: [{}],
@@ -84,7 +84,6 @@ const usuariosGetById = async (req = request, res = response) => {
     });
   }
 };
-
 const usuariosPut = async (req, res = response) => {
   const { id } = req.params;
   const { _id, password, google, email, state, img, ...resto } = req.body;

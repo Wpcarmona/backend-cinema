@@ -27,7 +27,6 @@ const obtenerFavoritosPorUsuario = async (req, res = response) => {
   }
 };
 
-// Obtener un solo favorito por ID de favorito
 const obtenerFavoritoPorId = async (req, res = response) => {
   const { id } = req.params;
 
